@@ -41,6 +41,11 @@ class filemap
                             // public function errorsExist(){
                             //   return (count($this->errors) > 0)? true : false;
                             // }
+                            //
+                            // public function getErrors(){
+                            //     var_dump($this->errors);
+                            //     die("<br>...script halted.");
+                            // }
 /***********************************************************************************/
                             public function endOfFile(){
                                 return (feof($this->pointer))? true : false;
@@ -92,15 +97,15 @@ class filemap
     public function __construct($path,$write=false){
         $this->path = $path;
         $this->fileSize = filesize($this->path);
-        if(!is_readable($path)) error_handler::$errors[] = "Invalid path in filemap.";//comment out for epoch block creation
+        //if(!is_readable($path)) $this->errors[] = "Invalid path in filemap.";//comment out for epoch block creation
         if($write === true){
             $this->getFlockWritePointer();//locks the file for writing
         }else{
             $this->getReadPointer();
         }
-          if(error_handler::errorsExist()){
-            error_handler::getErrors();
-          }
+          // if($this->errorsExist()){
+          //   $this->getErrors();
+          // }
     }
 ///////////////////////////////////////////
     public function positionPointer($bits){
@@ -120,7 +125,7 @@ class filemap
                                     }else{
                                         return $this->pointer;
                                     }
-                                    error_handler::$errors[] = "Unable to gain read access for filemap";
+                                    //$this->errors[] = "Unable to gain read access for filemap";
                                 }////////////////////////////////
 //////////////////////////////////////////////////////////////////
                               private function getFlockWritePointer(){
@@ -139,7 +144,7 @@ class filemap
                                 }else{
                                     return $this->pointer;
                                 }
-                                error_handler::$errors[] = "Unable to get write access for filemap";
+                                //$this->errors[] = "Unable to get write access for filemap";
                               }
 ///////////////////////////////////////////////////////
             public function write($line,$length=4096){
@@ -147,7 +152,7 @@ class filemap
               $line = $line . PHP_EOL;
               $return = fwrite($this->pointer,$line,$length);
               if(!$return){
-                error_handler::$errors[] = "Unable to write to file: {$this->path}";
+                //$this->errors[] = "Unable to write to file: {$this->path}";
                 return false;
               }else{
                 return $return;
