@@ -1,8 +1,12 @@
 <?php
-/********* Jacobs, Isaac, Krishna, Deilson ** all rights reserved **********/
-/***************************************************************************/
-/***************************************************************************/
-mb_internal_encoding('utf8');//if not already set
+/***********************************************************/
+/********************* didlie.com **************************/
+/********** file line iteration and search class ***********/
+/*auth:*** isaac krishna deilson jacobs christopher ********/
+/*************** all rights reserved according to:**********/
+/*********** GNU General Public License v3.0 ***************/
+/***********************************************************/
+
 ini_set("auto_detect_line_endings", true);
 
 class filemap
@@ -59,7 +63,6 @@ class filemap
                             public function autoCalibrate(){
                                 if($this->calibrated) return;
                               $this->getFirstLine();
-                              if(strlen($this->line) < ($this->depthBufferSize)) die("Filemap EOP: empty calibration line error.");
                               $this->calibrationLine = trim($this->line);
                               $this->standardLineLength = strlen($this->calibrationLine);
                               $this->depthBufferSize =
@@ -80,7 +83,6 @@ class filemap
                   $this->lineNumber = NULL;
                   $this->line = "";
                   $this->readLength = $this->memMax;
-                  //$this->lastLinePosition = $this->fileSize;
                   $this->lastLinePosition = 0;
                 }
 /********************************************************************************/
@@ -141,7 +143,7 @@ class filemap
                               }
 ///////////////////////////////////////////////////////
             public function write($line,$length=4096){
-              //fseek($this->pointer,filesize($this->path));
+              //no fseek required; handle is oppened in "a+"
               $line = $line . PHP_EOL;
               $return = fwrite($this->pointer,$line,$length);
               if(!$return){
@@ -163,8 +165,7 @@ class filemap
         $this->getFirstLine();
         while($this->line != ""){
           if(strpos($this->line,$string) !== false){
-            $line = $this->line;
-            return $line;
+            return $this->line;
           }
           $this->getNextLine();
         }
@@ -177,8 +178,7 @@ class filemap
         $this->getLastLine();
         while($this->line != false){
           if(strpos($this->line,$string) !== false){
-            $line = $this->line;
-            return $line;
+            return $this->line;
             }
           $this->getPreviousLine();
         }
@@ -187,12 +187,24 @@ class filemap
       }
 
 /************************************* forward line retrieval ********************************************/
+        public function operateAllLines($operation=NULL){
+            $i=0;
+            $this->reset();
+            fseek($this->pointer,0,SEEK_SET);
+            do{
+                $line = trim(stream_get_line($this->pointer,$this->memMax,PHP_EOL));
+                if($operation) $operation($line);
+                $i++;
+            }while(!feof($this->pointer));
+            return [$i,$line];
+        }
+
         public function getFirstLine(){
             $this->reset();
             $this->lineNumber = 0;
             $this->getNextLine();
             return $this->line;
-        }///////////////
+        }
 ///////////////////////////////////////////
         public function getNextLine(){
             $this->line = "";
@@ -205,7 +217,7 @@ class filemap
                 if(feof($this->pointer) && $this->line === ""){
                     return false;
                 }else{
-                    $this->lastLinePosition = $this->pointerPosition = ftell($this->pointer) + 10;
+                    $this->lastLinePosition = $this->pointerPosition = ftell($this->pointer);
                     //$this->lastLinePosition = ($this->pointerPosition += strlen($this->line));
                     $this->lineNumber++;
                     return $this->line;

@@ -11,7 +11,7 @@ $ft = microtime(true);
           }
 
 ///use of the function above stops operation
-echo "<h1>filemap class tests</h1>";
+echo "<pre><h1>filemap class tests</h1>";//extra pre open tag to make everything look mono
 
 
 
@@ -24,6 +24,15 @@ echo "<pre>Callibrating filemap class with line #1:<br>" . $filemap->getCalibrat
 // echo "<pre>" . json_encode($filemap->getCalibrationSettings()) . "</pre>";
 // exit();
 /************************ end of test calibration *********************/
+raceLines($filemap);
+        function raceLines($filemap){
+        echo "<h3>Race all lines time test, with optional operation call</h3>";
+            $t1 = microtime(true);
+            $out = $filemap->operateAllLines();
+        echo "<pre>...done<br>completed in " . (microtime(true) - $t1) . " seconds on " . $out[0] . " lines<br>Last line is:<br>{$out[1]}</pre>";
+        echo "<pre>This shows 1000001 because of an extra line ending in the file.</pre>";
+        }
+
 
 /****** test searc functions ************/
 termSearchInFile($filemap);
@@ -43,7 +52,7 @@ termSearchInFile($filemap);
               $searchTime = microtime(true);
               $string = $filemap->getLastLineWithString($search);
               if($string !== ""){
-                    echo "<h2>Russing a reverse line-by-line term search</h2>";
+                    echo "<h2>Running a reverse line-by-line term search</h2>";
                     echo "<pre>Last line found with '{$search}' is:<br>" . $string . "</pre>";
                     echo "<pre> '{$search}' found at position " . strpos($string,$search) . "</pre>";
                     echo "<pre> we are at line number " . $filemap->getLineNumber() . "</pre>";
